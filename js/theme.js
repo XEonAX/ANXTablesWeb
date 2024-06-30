@@ -31,7 +31,13 @@ function turnOnDarkMode() {
 	document.body.setAttribute("data-bs-theme", "dark")
 	localStorage.setItem(themeStorageKey, "dark")
 }
+
 function turnOffDarkMode() {
 	document.body.removeAttribute("data-bs-theme")
 	localStorage.setItem(themeStorageKey, "light")
 }
+
+window.addEventListener("load", (event) => {
+	document.getElementById("btnTurnOffDarkMode").addEventListener("click", turnOffDarkMode);
+	document.getElementById("btnTurnOnDarkMode").addEventListener("click", turnOnDarkMode);
+});

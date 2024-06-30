@@ -8,6 +8,8 @@
     <title>ANX Tables</title>
     <link rel="icon" type="image/svg+xml" href="./public/table-heart.svg" />
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler-flags.min.css">
     <link rel="stylesheet"
@@ -28,7 +30,7 @@
 </head>
 
 <body class=" layout-fluid">
-    <script src="./js/theme.js"></script>
+    <script type="module" src="./js/theme.js"></script>
     <div class="page">
         <!-- Topbar -->
         <header class="navbar navbar-expand-md d-print-none">
@@ -42,12 +44,13 @@
                     <a href="." class="btn btn-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             strsoke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="navbar-brand-image icon icon-tabler icons-tabler-outline icon-tabler-table-heart" stroke="#0054a6" style="stroke: var(--tblr-primary, #0054a6)">
+                            class="navbar-brand-image icon icon-tabler icons-tabler-outline icon-tabler-table-heart"
+                            stroke="#0054a6" style="stroke: var(--tblr-primary, #0054a6)">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path d="M11.5 21h-6.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v6" />
                             <path d="M3 10h18" />
                             <path d="M10 3v18" />
-                            <path 
+                            <path
                                 d="M18 22l3.35 -3.284a2.143 2.143 0 0 0 .005 -3.071a2.242 2.242 0 0 0 -3.129 -.006l-.224 .22l-.223 -.22a2.242 2.242 0 0 0 -3.128 -.006a2.143 2.143 0 0 0 -.006 3.071l3.355 3.296z" />
                         </svg>
                         ANX La Table
@@ -57,8 +60,8 @@
                 <div class="navbar-nav flex-row order-md-last">
                     <!-- Theme Switcher -->
                     <div class="d-none d-md-flex">
-                        <a onclick="turnOnDarkMode()" class="nav-link px-0 hide-theme-dark" title="Enable dark mode"
-                            data-bs-toggle="tooltip" data-bs-placement="bottom">
+                        <a id="btnTurnOnDarkMode" onclick="turnOnDarkMode()" class="nav-link px-0 hide-theme-dark"
+                            title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler-icons.io/i/moon -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -70,8 +73,8 @@
 
                         </a>
 
-                        <a onclick="turnOffDarkMode()" class="nav-link px-0 hide-theme-light" title="Enable light mode"
-                            data-bs-toggle="tooltip" data-bs-placement="bottom">
+                        <a id="btnTurnOffDarkMode" onclick="turnOffDarkMode()" class="nav-link px-0 hide-theme-light"
+                            title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler-icons.io/i/sun -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -123,7 +126,7 @@
                             <a href="./profile.html" class="dropdown-item">Profile</a>
                             <div class="dropdown-divider"></div>
                             <a href="./settings.html" class="dropdown-item">Settings</a>
-                            <a href="./sign-out.html" class="dropdown-item">Logout</a>
+                            <a onclick="signOut()" class="dropdown-item">Logout</a>
                         </div>
                     </div>
                 </div>
@@ -305,6 +308,96 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <h3 class="card-title">Candlesticks</h3>
+                                    </div>
+                                    <div id="chart-stocks-candlesticks"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Stocks</h3>
+                                </div>
+                                <div class="card-body border-bottom py-3">
+
+                                    <div class="d-flex">
+                                        <div class="text-secondary">
+                                            Symbol:
+                                            <div class="mx-2 d-inline-block">
+                                                <input id="table-stocks-symbol-text-search" type="text"
+                                                    class="form-control form-control-sm" placeholder="TATAMOTORS"
+                                                    value="TATAMOTORS " size="20" aria-label="Symbol">
+                                            </div>
+                                        </div>
+
+                                        <div class="ms-auto text-secondary">
+                                            Last
+                                            <div class="mx-2 d-inline-block">
+                                                <!-- <input id="table-stocks-last-days-limit" type="text" class="form-control form-control-sm"
+                                                    placeholder="20" value="20 " size="4" aria-label="Last Days"> -->
+                                                <select id="table-stocks-last-days-limit"
+                                                    class="form-control form-control-sm">
+                                                    <option value="5">5</option>
+                                                    <option value="14">14</option>
+                                                    <option value="30">30</option>
+                                                    <option value="90">90</option>
+                                                    <option value="200">200</option>
+                                                    <option value="500">500</option>
+                                                </select>
+                                            </div>
+                                            Days
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table card-table table-vcenter text-nowrap datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>Symbol</th>
+                                                <th>Date</th>
+                                                <th>Open</th>
+                                                <th>High</th>
+                                                <th>Low</th>
+                                                <th>Close</th>
+                                                <th>Volume</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-stocks-body">
+
+                                            <tr>
+                                                <td><span class="text-secondary">TATAMOTORS</span></td>
+                                                <td>
+                                                    2000-13-32
+                                                </td>
+                                                <td>
+                                                    1
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                                <td>
+                                                    0
+                                                </td>
+                                                <td>
+                                                    1
+                                                </td>
+                                                <td>
+                                                    1
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <script type="module" src="./js/anxstocks.js"></script>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -339,6 +432,16 @@
             </footer>
         </div>
     </div>
+    <script>
+        async function signOut() {
+            const response = await fetch("http://localhost:5035/logout", {
+                "credentials": "include",
+                "method": "GET",
+                mode: "cors",
+            });
+            window.location = ("./account/sign-in.html");
+        }
+    </script>
 </body>
 
 </html>
